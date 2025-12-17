@@ -2,7 +2,7 @@ package com.shakil1473.dailydairy.mapper;
 
 import com.shakil1473.dailydairy.domain.PostStatus;
 import com.shakil1473.dailydairy.domain.dto.CategoryDto;
-import com.shakil1473.dailydairy.domain.dto.CreateCategoryRequestDto;
+import com.shakil1473.dailydairy.domain.dto.CategoryRequestDto;
 import com.shakil1473.dailydairy.domain.entity.Category;
 import com.shakil1473.dailydairy.domain.entity.Post;
 import org.mapstruct.Mapper;
@@ -18,7 +18,7 @@ public interface CategoryMapper {
     @Mapping(target = "postCount", source = "posts", qualifiedByName = "calculatePostCount")
     CategoryDto categoryToCategoryDto(Category category);
 
-    Category toCategoryEntity(CreateCategoryRequestDto categoryRequestDto);
+    Category toCategoryEntity(CategoryRequestDto categoryRequestDto);
 
     @Named("calculatePostCount")
     default long calculatePostCount(List<Post> posts) {

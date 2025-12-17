@@ -26,14 +26,26 @@ public class ErrorController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponseDto> handleException(ApiErrorResponseDto apiErrorResponseDto) {
-        log.error("Caught illegal argument exception . " + apiErrorResponseDto.getMessage(), apiErrorResponseDto);
+    public ResponseEntity<ApiErrorResponseDto> handleIllegalArgumentException(IllegalArgumentException illegalArgumentException) {
+        log.error("Caught illegal argument exception . " + illegalArgumentException.getMessage(), illegalArgumentException);
 
         ApiErrorResponseDto error = ApiErrorResponseDto.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
-                .message(apiErrorResponseDto.getMessage())
+                .message(illegalArgumentException.getMessage())
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponseDto> handleIllegalArgumentException(IllegalStateException illegalStateException) {
+        log.error("Caught illegal argument exception . " + illegalStateException.getMessage(), illegalStateException);
+
+        ApiErrorResponseDto error = ApiErrorResponseDto.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(illegalStateException.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 }
