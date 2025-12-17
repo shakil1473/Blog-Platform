@@ -1,4 +1,4 @@
-package com.shakil1473.dailydairy.domain.entities;
+package com.shakil1473.dailydairy.domain.entity;
 
 import com.shakil1473.dailydairy.domain.PostStatus;
 import jakarta.persistence.*;

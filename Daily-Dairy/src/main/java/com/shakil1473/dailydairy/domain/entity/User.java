@@ -1,4 +1,4 @@
-package com.shakil1473.dailydairy.domain.entities;
+package com.shakil1473.dailydairy.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
