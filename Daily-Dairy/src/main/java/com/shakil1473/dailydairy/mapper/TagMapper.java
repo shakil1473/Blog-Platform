@@ -1,0 +1,29 @@
+package com.shakil1473.dailydairy.mapper;
+
+import com.shakil1473.dailydairy.domain.PostStatus;
+import com.shakil1473.dailydairy.domain.dto.TagResponseDto;
+import com.shakil1473.dailydairy.domain.entity.Post;
+import com.shakil1473.dailydairy.domain.entity.Tag;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
+
+import java.util.Set;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface TagMapper {
+    @Mapping(target = "postCount", source = "posts", qualifiedByName = "calculatePostCount")
+    TagResponseDto toTagResponseDto(Tag tag);
+
+    @Named("calculatePostCount")
+    default Integer calculatePostCount(Set<Post> posts) {
+        if(posts == null || posts.isEmpty()) {
+            return 0;
+        }
+
+        return (int) posts.stream()
+                .filter(post -> PostStatus.PUBLISHED.equals(post.getStatus()))
+                .count();
+    }
+}
