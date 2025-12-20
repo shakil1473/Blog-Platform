@@ -1,6 +1,7 @@
 package com.shakil1473.dailydairy.service.implementations;
 
 import com.shakil1473.dailydairy.domain.PostStatus;
+import com.shakil1473.dailydairy.domain.dto.PostRequestDto;
 import com.shakil1473.dailydairy.domain.dto.PostResponseDto;
 import com.shakil1473.dailydairy.domain.dto.UserDto;
 import com.shakil1473.dailydairy.domain.entity.Category;
@@ -14,10 +15,12 @@ import com.shakil1473.dailydairy.service.PostService;
 import com.shakil1473.dailydairy.service.TagService;
 import com.shakil1473.dailydairy.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +34,8 @@ public class PostServiceImplementation implements PostService {
     private final TagService tagService;
     private final PostMapper postMapper;
     private final UserService userService;
+
+    private final Integer WORDS_PER_MINUTE = 200;
 
     @Override
     public List<PostResponseDto> getAllPublishedPosts(UUID categoryId, UUID tagId) {
@@ -98,5 +103,68 @@ public class PostServiceImplementation implements PostService {
             postResponseDtos.add(postMapper.toPostResponseDto(post));
         }
         return postResponseDtos;
+    }
+
+    @Override
+    public PostResponseDto CreatePost(UUID userId, PostRequestDto postRequestDto) {
+        Post post = postMapper.toPost(postRequestDto);
+        post.setReadingTime(calculateReadingTime(post.getContent()));
+
+        User user = userService.getUserById(userId);
+        post.setAuthor(user);
+
+        post.setCategory(categoryService.getCategoryById(postRequestDto.getCategoryId()));
+
+        for(UUID tagId: postRequestDto.getTagIds()) {
+            Tag tag = tagService.getTagById(tagId);
+            post.getTags().add(tagService.getTagById(tagId));
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        post.setCreatedAt(now);
+        post.setUpdatedAt(now);
+
+        return postMapper.toPostResponseDto(postRepository.save(post));
+    }
+
+    @Override
+    public PostResponseDto UpdatePost(UUID userId, PostRequestDto postRequestDto) {
+        Post post = postRepository.findPostById(postRequestDto.getId());
+        if(post == null) {
+            throw new EntityNotFoundException("Post with id " + postRequestDto.getId() + " not found");
+        }
+
+        Post updatedPost = postMapper.toPost(postRequestDto,  post);
+
+        updatedPost.setReadingTime(calculateReadingTime(post.getContent()));
+        updatedPost.setCategory(categoryService.getCategoryById(postRequestDto.getCategoryId()));
+        post.getTags().removeAll(post.getTags());
+
+        for(UUID tagId: postRequestDto.getTagIds()) {
+            post.getTags().add(tagService.getTagById(tagId));
+        }
+
+        post.setUpdatedAt(LocalDateTime.now());
+        return postMapper.toPostResponseDto(postRepository.save(post));
+    }
+
+    @Transactional
+    @Override
+    public void deletePost(UUID userId, UUID postId) {
+        Post post = postRepository.findPostById(postId);
+        if(post == null) {
+            throw new EntityNotFoundException("Post with id " + postId + " not found");
+        }
+
+        userService.removeUserPosts(userId, post);
+        postRepository.delete(post);
+    }
+
+    private Integer calculateReadingTime(String content) {
+        if(content == null || content.isEmpty()) {
+            return 0;
+        }
+        int totalWords = content.trim().split(" ").length;
+        return (int) Math.ceil((double) totalWords / WORDS_PER_MINUTE);
     }
 }

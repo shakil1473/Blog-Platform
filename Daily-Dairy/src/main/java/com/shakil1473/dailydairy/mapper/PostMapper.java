@@ -1,11 +1,14 @@
 package com.shakil1473.dailydairy.mapper;
 
 
+import com.shakil1473.dailydairy.domain.dto.PostRequestDto;
 import com.shakil1473.dailydairy.domain.dto.PostResponseDto;
 import com.shakil1473.dailydairy.domain.entity.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
+
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PostMapper {
@@ -13,4 +16,9 @@ public interface PostMapper {
     @Mapping(target = "category", source = "category")
     @Mapping(target = "tags", source = "tags")
     PostResponseDto toPostResponseDto(Post post);
+
+    @Mapping(target = "id",  ignore = true)
+    Post toPost(PostRequestDto postRequestDto);
+
+    Post toPost(PostRequestDto postRequestDto, @MappingTarget Post post);
 }

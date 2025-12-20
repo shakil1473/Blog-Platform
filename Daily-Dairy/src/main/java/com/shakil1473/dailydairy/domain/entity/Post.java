@@ -23,7 +23,7 @@ public class Post {
     private UUID id;
 
     @Column(nullable = false)
-    private String name;
+    private String title;
 
     @Column(nullable = false, columnDefinition = "text")
     private String content;
@@ -62,7 +62,7 @@ public class Post {
         if (o == null || getClass() != o.getClass()) return false;
         Post post = (Post) o;
         return Objects.equals(id, post.id) &&
-                Objects.equals(name, post.name) &&
+                Objects.equals(title, post.title) &&
                 Objects.equals(content, post.content) &&
                 status == post.status &&
                 Objects.equals(readingTime, post.readingTime) &&
@@ -72,7 +72,7 @@ public class Post {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, content, status, readingTime, createdAt, updatedAt);
+        return Objects.hash(id, title, content, status, readingTime, createdAt, updatedAt);
     }
 
     @PrePersist
