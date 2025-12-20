@@ -1,11 +1,10 @@
 package com.shakil1473.dailydairy.controller;
 
-import com.shakil1473.dailydairy.domain.dto.AuthResponse;
+import com.shakil1473.dailydairy.domain.dto.AuthResponseDto;
 import com.shakil1473.dailydairy.domain.dto.LoginRequestDto;
 import com.shakil1473.dailydairy.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,19 +19,19 @@ public class AuthController {
     private final AuthenticationService authenticationService;
 
     @PostMapping
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
         UserDetails userDetails = authenticationService.authenticate(
                 loginRequestDto.getEmail(),
                 loginRequestDto.getPassword()
         );
 
         String tokenValue = authenticationService.generateToken(userDetails);
-        AuthResponse authResponse =  AuthResponse.builder()
+        AuthResponseDto authResponseDto =  AuthResponseDto.builder()
                 .token(tokenValue)
                 .expiresIn(3600)
                 .build();
 
-        return ResponseEntity.ok(authResponse);
+        return ResponseEntity.ok(authResponseDto);
     }
 
 }

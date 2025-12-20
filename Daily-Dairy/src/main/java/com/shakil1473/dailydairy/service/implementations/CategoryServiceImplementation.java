@@ -6,6 +6,7 @@ import com.shakil1473.dailydairy.domain.entity.Category;
 import com.shakil1473.dailydairy.mapper.CategoryMapper;
 import com.shakil1473.dailydairy.repository.CategoryRepository;
 import com.shakil1473.dailydairy.service.CategoryService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,16 @@ public class CategoryServiceImplementation implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+
+    @Override
+    public Category getCategoryById(UUID categoryId) {
+        Optional<Category> category = categoryRepository.findById(categoryId);
+        if(category.isPresent()) {
+            return category.get();
+        }
+
+        throw new EntityNotFoundException("Category with id " + categoryId + " not found");
+    }
 
     @Override
     public List<CategoryDto> getAllCategories() {

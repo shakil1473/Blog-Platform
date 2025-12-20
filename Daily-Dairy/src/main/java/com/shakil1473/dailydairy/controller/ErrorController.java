@@ -1,6 +1,7 @@
 package com.shakil1473.dailydairy.controller;
 
 import com.shakil1473.dailydairy.domain.dto.ApiErrorResponseDto;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +61,17 @@ public class ErrorController {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiErrorResponseDto> handleEntityNotFoundException(EntityNotFoundException entityNotFoundException) {
+        log.error("Caught entity not found exception . " + entityNotFoundException.getMessage(), entityNotFoundException);
+
+        ApiErrorResponseDto error = ApiErrorResponseDto.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(entityNotFoundException.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 }

@@ -6,6 +6,7 @@ import com.shakil1473.dailydairy.domain.entity.Tag;
 import com.shakil1473.dailydairy.mapper.TagMapper;
 import com.shakil1473.dailydairy.repository.TagRepository;
 import com.shakil1473.dailydairy.service.TagService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,16 @@ public class TagServiceImplementation implements TagService {
 
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
+
+    @Override
+    public Tag getTagById(UUID tagId) {
+        Optional<Tag> optionalTag = tagRepository.findById(tagId);
+        if(optionalTag.isPresent()) {
+            return optionalTag.get();
+        }
+
+        throw new EntityNotFoundException("Tag with id " + tagId + " not found");
+    }
 
     @Override
     public List<TagResponseDto> getAllTags() {
