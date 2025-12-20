@@ -2,14 +2,12 @@ package com.shakil1473.dailydairy.controller;
 
 
 import com.shakil1473.dailydairy.domain.dto.PostResponseDto;
+import com.shakil1473.dailydairy.domain.dto.UserDto;
 import com.shakil1473.dailydairy.service.PostService;
+import com.shakil1473.dailydairy.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,12 +18,20 @@ import java.util.UUID;
 public class PostController {
 
     private final PostService postService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> getPosts(
             @RequestParam(required = false) UUID categoryId,
             @RequestParam(required = false) UUID tagId
     ) {
-        return ResponseEntity.ok(postService.getAllPosts(categoryId, tagId));
+        return ResponseEntity.ok(postService.getAllPublishedPosts(categoryId, tagId));
+    }
+
+    @GetMapping(path = "/drafts")
+    public ResponseEntity<List<PostResponseDto>> getDrafts(@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(
+                postService.getAllDraftPosts(userDto)
+        );
     }
 }
